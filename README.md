@@ -568,7 +568,7 @@ This project uses open-source technologies and pretrained models from:
 Developed as a final-year data science and natural language processing project.
 
 ```text
-Author: YOUR_NAME
-Institution: YOUR_INSTITUTION
+Author: Atif
+Institution: iub
 Department: Data Science
 ```
