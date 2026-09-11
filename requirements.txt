@@ -1,0 +1,6 @@
+streamlit==1.45.1
+transformers==4.56.2
+torch
+sentencepiece
+sacremoses
+accelerate

@@ -1,0 +1,49 @@
+# Conda, virtual environments
+venv/
+env/
+.venv/
+.conda/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Model and Hugging Face cache
+.cache/
+.cache/
+huggingface/
+transformers_cache/
+
+# Environment and secret files
+.env
+.env.*
+.streamlit/secrets.toml
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# IDE settings
+.vscode/
+.idea/
+
+# Generated files
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.zip
+
+# Local data files
+data/
+models/
+checkpoints/
