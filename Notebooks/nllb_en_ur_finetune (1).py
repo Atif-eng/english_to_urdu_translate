@@ -1,14 +1,3 @@
-# %% [markdown]
-# # English -> Urdu fine-tuning of NLLB
-# Datasets: english_urdu.csv, parallel-corpus.csv, quran.csv
-# Pipeline: load -> auto-detect columns -> clean -> filter -> dedupe -> split
-#           -> zero-shot baseline -> fine-tune -> evaluate -> error analysis -> save
-
-# %% 0. Install (Kaggle / Colab). Uncomment what you need.
-# !pip install -q -U transformers datasets sacrebleu sentencepiece accelerate
-# Optional extras:
-# !pip install -q sentence-transformers unbabel-comet
-
 # %% 1. Imports and configuration
 import os, re, json, html, inspect, unicodedata, warnings
 from collections import Counter
@@ -573,39 +562,3 @@ def translate_en_to_ur(sentences, beams=NUM_BEAMS):
 
 for s in ["How are you today?", "Knowledge is better than wealth.", "The meeting has been postponed until Monday."]:
     print(s, "->", translate_en_to_ur(s)[0])
-
-# %% 17. Save everything you need to use the model on your own machine
-import shutil
-
-SAVE_ORIGINAL_PRETRAINED = True    # also keep the untouched NLLB base model (about 2.4 GB extra)
-DELETE_CHECKPOINTS = True          # checkpoints include optimizer states and are huge; not needed locally
-
-# (a) full-precision fine-tuned model (best checkpoint) -- already saved in step 13, re-save to be safe
-full_dir = f"{OUT_DIR}/final_model"
-model.save_pretrained(full_dir, safe_serialization=True)
-tok.save_pretrained(full_dir)
-
-# (b) half-precision copy: about half the size, same quality for inference, works on CPU and GPU
-half_dir = f"{OUT_DIR}/final_model_fp16"
-model.to(torch.float16).save_pretrained(half_dir, safe_serialization=True)
-tok.save_pretrained(half_dir)
-model.to(torch.float32)  # restore, in case you keep using the notebook
-
-# (c) the original pretrained NLLB, if you want it locally for comparison
-if SAVE_ORIGINAL_PRETRAINED:
-    base_dir = f"{OUT_DIR}/nllb_pretrained_original"
-    AutoModelForSeq2SeqLM.from_pretrained(MODEL_NAME).save_pretrained(base_dir, safe_serialization=True)
-    AutoTokenizer.from_pretrained(MODEL_NAME).save_pretrained(base_dir)
-
-if DELETE_CHECKPOINTS:
-    shutil.rmtree(f"{OUT_DIR}/checkpoints", ignore_errors=True)
-
-# (d) zip for download (on Kaggle the files appear under the notebook's Output tab)
-zip_base = os.path.join(os.path.dirname(OUT_DIR.rstrip("/")) or ".", "nllb_en_ur_finetuned_fp16")
-zip_path = shutil.make_archive(zip_base, "zip", root_dir=half_dir)
-print("Download this file:", zip_path, f"({os.path.getsize(zip_path) / 1e9:.2f} GB)")
-print("Full-precision model folder:", full_dir)
-
-# To reuse the model later:
-#   tok = AutoTokenizer.from_pretrained(final_dir, src_lang="eng_Latn", tgt_lang="urd_Arab")
-#   model = AutoModelForSeq2SeqLM.from_pretrained(final_dir)
